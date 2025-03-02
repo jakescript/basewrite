@@ -22,7 +22,7 @@ export async function GET(req, { params }) {
   const metadata = {
     name: `Disc #${id}`,
     description: 'NFT representing allotted character limit to contribute to collaberative stories.',
-    image: `http://localhost:3000/api/image?tokenId=${id}&charLimit=${traits.charLimit}`,
+    image: `${process.env.BASE_URL}/api/image?tokenId=${id}&charLimit=${traits.charLimit}`,
     attributes: [
       {
         trait_type: 'Char Limit',

@@ -35,7 +35,7 @@ export async function GET(req) {
     const width = decodedGif.width || 800;
     const height = decodedGif.height || 800;
 
-    const endChar = '~'
+    const endChar = '*'
 
     // Create an overlay canvas and draw your overlay text once.
     const overlayCanvas = createCanvas(width, height);

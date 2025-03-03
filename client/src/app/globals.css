@@ -6,15 +6,24 @@
 }
 
 :root {
+  /* --background: rgb(0,63,255); */
+  /* --foreground: #fff; */
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --background: #0a0a0a; */
+/*     --foreground: #ededed; */
+/*   } */
+/* } */
+
+@font-face {
+  font-family: 'c64';
+  src: url('/c64.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {

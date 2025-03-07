@@ -4,6 +4,7 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
+const { ethers } = require('hardhat')
 
 describe("Disk", function () {
   async function deployAndSet() {
@@ -12,13 +13,12 @@ describe("Disk", function () {
     const Disk = await ethers.getContractFactory("Disk");
     const disk = await Disk.deploy();
 
-    return { owner, otherAccount, disk };
+    return { disk, owner, otherAccount };
   }
 
-  // describe("Deployment", function () {
-  //   it("Should set the right owner", async function () {
-  //     const { disk, owner } = await loadFixture(deployAndSet);
-  //     expect(await disk.owner()).to.equal(owner.address);
-  //   });
-  // });
+  it.only('deplys', async () => {
+    const { disk } = await loadFixture(deployAndSet)
+    console.log(disk)
+  })
+
 });

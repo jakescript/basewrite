@@ -93,7 +93,8 @@ export async function GET(req) {
       headers: { "Content-Type": "image/gif" },
     });
   } catch (err) {
-    console.log(err)
+    console.log('Error Generating Image', err)
+    return NextResponse.json({ error: err, message: 'Failed Image Generation' }, { status: 500 })
   }
 }
 

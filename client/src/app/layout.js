@@ -1,6 +1,9 @@
+import '@coinbase/onchainkit/styles.css';
 import { Geist, Geist_Mono } from "next/font/google";
-import Head from "next/head";
+import Idendity from "./components/identity"
+import { Providers } from "./components/providers";
 import "./globals.css";
+import Navbar from './components/nav';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,18 +26,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className='bg-black text-white justify-center items-center flex py-[10px] px-[400px]'>
-          <div className='flex gap-[10px] justify-between w-full'>
-            <p className='font-bold' style={{ fontFamily: `'c64', sans-serif`}}># BaseWrite</p>
-            <ul className='flex gap-[25px]'>
-              <li>Mint</li>
-              <li>Write</li>
-              <li>About</li>
-            </ul>
-            <button className='font-bold'>Connect Wallet</button>
-          </div>
-        </div>
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

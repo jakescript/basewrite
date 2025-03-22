@@ -19,7 +19,7 @@ export async function GET(req) {
     }
 
     // Load the GIF from disk
-    const gifPath = path.join(process.cwd(), "public", "images", "disk_black_medium.gif");
+    const gifPath = path.join(process.cwd(), "public", "disk_black_medium.gif");
     if (!fs.existsSync(gifPath)) {
       console.error("GIF file not found at path:", gifPath);
       return NextResponse.json({ error: "GIF file not found" }, { status: 500 });

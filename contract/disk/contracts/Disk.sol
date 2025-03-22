@@ -13,7 +13,7 @@ contract Disk is ERC721URIStorage, Ownable {
     mapping(uint => uint) public charLimits;
     mapping(uint => uint) public usedChars;
 
-    constructor(address initalOwner, uint initalLimit) ERC721("DISK", "DOB") Ownable(initalOwner) {
+    constructor(uint initalLimit) ERC721("DISK", "DOB") Ownable(msg.sender) {
         defaultCharLimit = initalLimit;
     }
 

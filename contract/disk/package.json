@@ -8,7 +8,8 @@
     "test": "npx hardhat test",
     "build": "npx hardhat compile",
     "deploy:local": "npx hardhat ignition deploy ./ignition/modules/Disk.js --network localhost",
-    "deploy": "npx hardhat ignition deploy ./ignition/modules/Disk.js"
+    "deploy:test": "npx hardhat ignition deploy ./ignition/modules/Disk.js",
+    "verify:testnet": "npx hardhat verify --network base-sepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

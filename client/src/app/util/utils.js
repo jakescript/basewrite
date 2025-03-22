@@ -1,4 +1,8 @@
 import { ethers } from "ethers";
+import fs from 'fs'
+import path from 'path'
+import { GifCodec } from 'gifwrap'
+
 
 export const init = async () => {
   let signer = null;
@@ -31,3 +35,17 @@ export const init = async () => {
     provider
   }
 }
+let cachedFrames = null;
+
+export async function getDecodedGifFrames() {
+  if (cachedFrames) return cachedFrames;
+
+  const gifPath = path.join(process.cwd(), 'public', 'disk_black_medium.gif');
+  const codec = new GifCodec();
+  const gifBuffer = fs.readFileSync(gifPath);
+  const decodedGif = await codec.decodeGif(gifBuffer);
+
+  cachedFrames = decodedGif.frames; // raw frames, ready to be drawn onto
+  return cachedFrames;
+}
+

@@ -43,9 +43,12 @@ const applyOverlay = (decodedGif, overlayCanvas, width, height) => {
       frame.bitmap.width,
       frame.bitmap.height
     )
+
+    frameCtx.fillStyle = 'white';
+    frameCtx.fillRect(0, 0, width, height); // fill canvas white first
     
     // draw gif and overlay convas on top
-    frameCtx.putImageData(imageData, 0, 0);
+    frameCtx.putImageData(imageData, 50, 50);
     frameCtx.drawImage(overlayCanvas, 0, 0, width, height);
 
     const compositeImageData = frameCtx.getImageData(0, 0, width, height);
@@ -77,8 +80,8 @@ export async function GET(req) {
 
     const decodedGif = await decodedGifPromise
 
-    const width = 500;
-    const height = 500;
+    const width = 600;
+    const height = 600;
 
     const overlayCanvas = createOverlayCanvas({
       tokenId,

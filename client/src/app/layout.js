@@ -1,19 +1,16 @@
 import '@coinbase/onchainkit/styles.css';
-import { Geist, Geist_Mono } from "next/font/google";
+import { Ubuntu_Sans_Mono } from "next/font/google";
 import Idendity from "./components/identity"
 import { Providers } from "./components/providers";
 import "./globals.css";
 import Navbar from './components/nav';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const ubuntu = Ubuntu_Sans_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-ubuntu',
+  display: 'swap',
+})
 
 export const metadata = {
   title: "BaseWrite",
@@ -24,7 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${ubuntu.variable}`}
       >
         <Providers>
           <Navbar />

@@ -13,10 +13,10 @@ const Idendity = () => {
   }
 
   return (
-    <div>
+    <div className='flex gap-[20px]'>
       {ensAvatar && <img alt="ENS Avatar" src={ensAvatar} />}
-      {address && <div>{ensName ? `${ensName} (${address})` : address}</div>}
-      <button onClick={() => disconnect()}>Disconnect</button>
+      {address && <div className='whitespace-nowrap w-[100px] overflow-hidden text-ellipsis'>{ensName ? `${ensName} (${address})` : address}</div>}
+      {/* <button onClick={() => disconnect()}>Disconnect</button> */}
     </div>
   )
 }

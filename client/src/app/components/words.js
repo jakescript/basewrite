@@ -2,109 +2,133 @@
 
 import { useEffect, useRef } from 'react'
 
-const wordWidth = 34
 const wordHeight = 16
-const RADIUS = 100
+const RADIUS = 120
+const FADE_SPEED = 0.05
+const PADDING_BETWEEN_PHRASES = 4
 
-const RepeatingWords = () => {
-  const containerRef = useRef(null)
-  const words = ['BASE', 'WRITE']
-  const wordRefs = useRef([])
-  const timeoutMap = useRef(new WeakMap())
+const CanvasWords = () => {
+  const canvasRef = useRef(null)
+  const animationRef = useRef(null)
+  const mouse = useRef({ x: -1000, y: -1000 })
   const inactivityTimeout = useRef(null)
+  const wordGrid = useRef([])
+  const phraseWidthRef = useRef(0)
+
+  const phrase = [
+    { text: 'BASE', weight: 400 },
+    { text: 'WRITE', weight: 700 },
+  ]
 
   useEffect(() => {
-    const cols = Math.ceil(window.innerWidth / wordWidth)
-    const rows = Math.ceil(window.innerHeight / wordHeight)
-    const total = cols * rows
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
 
-    wordRefs.current = []
-
-    const elements = Array.from({ length: total }, (_, i) => {
-      const el = document.createElement('p')
-      el.textContent = words[i % words.length]
-      el.className =
-        'flex items-center justify-center opacity-[10%] transition-transform duration-300 ease-in-out cursor-pointer'
-      el.style.fontSize = '11px'
-      el.style.transition = 'all 0.2s ease-in-out'
-      el.style.fontWeight = i % words.length ? '400' : '800'
-      el.style.opacity = '0.1'
-      el.style.filter = 'blur(1.25px)'
-      wordRefs.current.push(el)
-      return el
-    })
-
-    if (containerRef.current) {
-      containerRef.current.innerHTML = ''
-      elements.forEach(el => containerRef.current?.appendChild(el))
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      generateWordGrid()
     }
 
-    const fadeOutWord = (word) => {
-      word.style.transform = 'scale(1)'
-      word.style.color = ''
-      word.style.opacity = '0.1'
-      word.style.filter = 'blur(2px)'
+    const generateWordGrid = () => {
+      let totalWidth = 0
+      phrase.forEach(part => {
+        ctx.font = `${part.weight === 700 ? 'bold' : 'normal'} 11px 'Ubuntu Sans Mono'`
+        totalWidth += ctx.measureText(part.text).width
+      })
+      totalWidth += PADDING_BETWEEN_PHRASES
+      phraseWidthRef.current = totalWidth
+
+      const cols = Math.ceil(window.innerWidth / totalWidth)
+      const rows = Math.ceil(window.innerHeight / wordHeight)
+      wordGrid.current = []
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          wordGrid.current.push({
+            x: x * totalWidth,
+            y: y * wordHeight + wordHeight,
+            opacity: 0.1,
+            targetOpacity: 0.1,
+          })
+        }
+      }
+    }
+
+    const update = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.textAlign = 'left'
+      ctx.textBaseline = 'top'
+
+      for (const w of wordGrid.current) {
+        const centerX = w.x + phraseWidthRef.current / 2
+        const centerY = w.y - wordHeight / 2
+        const dx = centerX - mouse.current.x
+        const dy = centerY - mouse.current.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        w.targetOpacity = dist < RADIUS ? 0.8 : 0.1
+        w.opacity += (w.targetOpacity - w.opacity) * FADE_SPEED
+
+        let currentX = w.x
+
+        ctx.save()
+        ctx.globalAlpha = w.opacity
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+        const maxBlur = 2.5
+        ctx.shadowBlur = (1 - w.opacity) * maxBlur
+
+        for (const part of phrase) {
+          ctx.font = `${part.weight === 700 ? 'bold' : 'normal'} 11px 'Ubuntu Sans Mono'`
+          ctx.fillStyle = 'black'
+          ctx.fillText(part.text, Math.round(currentX), Math.round(w.y))
+          const partWidth = ctx.measureText(part.text).width
+          currentX += partWidth
+        }
+
+        ctx.restore()
+      }
+
+      animationRef.current = requestAnimationFrame(update)
     }
 
     const handleMouseMove = (e) => {
+      mouse.current.x = e.clientX
+      mouse.current.y = e.clientY
+
+      // Reset inactivity timer
       if (inactivityTimeout.current) {
         clearTimeout(inactivityTimeout.current)
       }
 
       inactivityTimeout.current = setTimeout(() => {
-        wordRefs.current.forEach(word => {
-          word.style.transition = 'all 0.8s ease-out'
-          fadeOutWord(word)
-          timeoutMap.current.delete(word)
-        })
-      }, 800)
-
-      wordRefs.current.forEach(word => {
-        const rect = word.getBoundingClientRect()
-        const wordX = rect.left + rect.width / 2
-        const wordY = rect.top + rect.height / 2
-        const dx = wordX - e.clientX
-        const dy = wordY - e.clientY
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        if (distance < RADIUS) {
-          const existingTimeout = timeoutMap.current.get(word)
-          if (existingTimeout) {
-            clearTimeout(existingTimeout)
-            timeoutMap.current.delete(word)
-          }
-
-          word.style.transition = 'all 0.2s ease-in-out'
-          word.style.opacity = '0.8'
-          word.style.filter = 'blur(0px)'
-        } else {
-          if (!timeoutMap.current.has(word)) {
-            const timeoutId = window.setTimeout(() => {
-              fadeOutWord(word)
-              timeoutMap.current.delete(word)
-            }, 200)
-            timeoutMap.current.set(word, timeoutId)
-          }
-        }
-      })
+        // Pretend mouse left screen
+        mouse.current.x = -1000
+        mouse.current.y = -1000
+      }, 1500)
     }
 
     const handleMouseLeave = () => {
-      // Trigger same fade-out styles as the timeout version
-      wordRefs.current.forEach(word => {
-        word.style.transition = 'all 0.8s ease-out'
-        fadeOutWord(word)
-        timeoutMap.current.delete(word)
-      })
+      mouse.current.x = -1000
+      mouse.current.y = -1000
+      if (inactivityTimeout.current) {
+        clearTimeout(inactivityTimeout.current)
+      }
     }
 
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
     window.addEventListener('mousemove', handleMouseMove)
-    document.body.addEventListener('pointerleave', handleMouseLeave)
+    window.addEventListener('pointerleave', handleMouseLeave)
     window.addEventListener('blur', handleMouseLeave)
 
+    animationRef.current = requestAnimationFrame(update)
+
     return () => {
+      cancelAnimationFrame(animationRef.current)
+      window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('mousemove', handleMouseMove)
-      document.body.removeEventListener('pointerleave', handleMouseLeave)
+      window.removeEventListener('pointerleave', handleMouseLeave)
       window.removeEventListener('blur', handleMouseLeave)
 
       if (inactivityTimeout.current) {
@@ -114,16 +138,12 @@ const RepeatingWords = () => {
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      className="grid w-screen h-screen absolute select-none overflow-hidden"
-      style={{
-        gridTemplateColumns: `repeat(auto-fill, minmax(${wordWidth}px, 1fr))`,
-        gridAutoRows: `minmax(${wordHeight}px, auto)`,
-      }}
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-screen h-screen z-[-1] select-none"
     />
   )
 }
 
-export default RepeatingWords
+export default CanvasWords
 

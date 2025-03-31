@@ -1,8 +1,6 @@
 const {
-  time,
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
-const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { ethers } = require('hardhat')
 
@@ -11,7 +9,7 @@ describe("Disk", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const Disk = await ethers.getContractFactory("Disk");
-    const disk = await Disk.deploy(owner.address, 100);
+    const disk = await Disk.deploy(100);
 
     return { disk, owner, otherAccount };
   }
@@ -51,6 +49,27 @@ describe("Disk", function () {
     await tx.wait()
 
     expect(await disk.ownerOf(1)).to.eql(owner.address)
+  })
+
+  it('can list all owner token ids', async () => {
+    const { disk, owner } = await loadFixture(deployAndSet)
+
+    const tx = await disk.mint()
+    await tx.wait()
+
+    const tx2 = await disk.mint()
+    await tx2.wait()
+
+    const balance = await disk.balanceOf(owner.address)
+
+    let tokenIds = []
+
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await disk.tokenOfOwnerByIndex(owner.address, i)
+      tokenIds.push(Number(tokenId))
+    }
+
+    expect(tokenIds).to.eql([1,2])
   })
 
   it('sets initial character limits', async () => {

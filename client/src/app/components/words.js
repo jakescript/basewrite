@@ -16,7 +16,7 @@ const CanvasWords = () => {
   const phraseWidthRef = useRef(0)
 
   const phrase = [
-    { text: 'BASE', weight: 400 },
+    { text: 'BASE ', weight: 400 },
     { text: 'WRITE', weight: 700 },
   ]
 
@@ -74,9 +74,9 @@ const CanvasWords = () => {
 
         ctx.save()
         ctx.globalAlpha = w.opacity
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
-        const maxBlur = 2.5
-        ctx.shadowBlur = (1 - w.opacity) * maxBlur
+        // ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+        // const maxBlur = 1
+        // ctx.shadowBlur = (1 - w.opacity) * maxBlur
 
         for (const part of phrase) {
           ctx.font = `${part.weight === 700 ? 'bold' : 'normal'} 11px 'Ubuntu Sans Mono'`

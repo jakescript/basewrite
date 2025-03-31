@@ -19,7 +19,7 @@ export default function MintButton() {
 
   const handleMint = () => {
     writeContract({
-      address: '0x3E86F36a750Ebb3F4B34eb85F2d5d9A876bE0DD8',
+      address: '0xC3D5EB67D166bCb2a8680d20ad3E5E3b9e19b29B',
       abi: disk?.abi,
       functionName: 'mint'
     })

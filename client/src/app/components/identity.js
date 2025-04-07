@@ -67,7 +67,7 @@ const Idendity = () => {
     }
 
     getTokenIds(address, balance)
-  }, [address, balance, getTokenIds])
+  }, [address, balance, getTokenIds()])
 
 
   if (!address) {

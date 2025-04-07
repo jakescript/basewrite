@@ -5,7 +5,6 @@ pragma solidity >=0.8.2 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 contract Disk is ERC721URIStorage, ERC721Enumerable, Ownable {
     uint public tokenCount;
@@ -38,6 +37,10 @@ contract Disk is ERC721URIStorage, ERC721Enumerable, Ownable {
       usedChars[tokenId] += amount;
 
       return usedChars[tokenId];
+    }
+
+    function getRemainingChars(uint tokenId) public view returns (uint) {
+      return charLimits[tokenId] - usedChars[tokenId];
     }
 
     function _baseURI() internal pure override returns (string memory) {

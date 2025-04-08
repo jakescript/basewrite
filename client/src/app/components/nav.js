@@ -8,7 +8,7 @@ const Navbar = () => {
     >
       <div className='flex gap-[10px] justify-between w-full items-center'>
         <div className='flex gap-[10px]'>
-          <p className='font-bold' style={{ fontFamily: `'c64', sans-serif`}}>* BaseWrite</p>
+          <p className='font-bold' style={{ fontFamily: `'c64', sans-serif`}}><Link href='/'>* BaseWrite</Link></p>
           <ul className='flex gap-[25px]' style={{ marginLeft: 50 }}>
             <li><Link href='/mint'>Mint</Link></li>
             <li><Link href='/write'>Write</Link></li>

@@ -14,9 +14,10 @@ const StoryTextArea = () => {
 
     const newCount = initialLimits - characterChange
 
-    setAvailableChars(newCount)
     setPreviousValue(previousValue)
     setValue(currentVal)
+
+    setAvailableChars(newCount)
   }
 
 

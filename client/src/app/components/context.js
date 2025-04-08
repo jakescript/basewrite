@@ -23,14 +23,14 @@ export const AppContextProvider = ({ children }) => {
 
     for(let i = 0; i < ids.length; i++) {
       initialCharPromises.push(client.readContract({
-        address: '0xC3D5EB67D166bCb2a8680d20ad3E5E3b9e19b29B',
+        address: process.env.NEXT_PUBLIC_DISK_ADDRESS,
         abi: disk?.abi,
         functionName: 'charLimits',
         args: [ ids[i] ],
       }))
 
       usedCharPromises.push(client.readContract({
-        address: '0xC3D5EB67D166bCb2a8680d20ad3E5E3b9e19b29B',
+        address: process.env.NEXT_PUBLIC_DISK_ADDRESS,
         abi: disk?.abi,
         functionName: 'usedChars',
         args: [ ids[i] ],

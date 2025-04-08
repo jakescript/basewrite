@@ -29,7 +29,7 @@ const Idendity = () => {
     }, [address]); 
 
   const { data: balance } = useReadContract({
-    address: '0xC3D5EB67D166bCb2a8680d20ad3E5E3b9e19b29B',
+    address: process.env.NEXT_PUBLIC_DISK_ADDRESS,
     abi: disk?.abi,
     functionName: 'balanceOf',
     args: [ address ],
@@ -44,7 +44,7 @@ const Idendity = () => {
 
       for (let i = 0; i < balance; i++) {
         promises.push(client.readContract({
-          address: '0xC3D5EB67D166bCb2a8680d20ad3E5E3b9e19b29B',
+          address: process.env.NEXT_PUBLIC_DISK_ADDRESS,
           abi: disk?.abi,
           functionName: 'tokenOfOwnerByIndex',
           args: [ address, i ],
@@ -67,7 +67,7 @@ const Idendity = () => {
     }
 
     getTokenIds(address, balance)
-  }, [address, balance, getTokenIds()])
+  }, [address, balance])
 
 
   if (!address) {

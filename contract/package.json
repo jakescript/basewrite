@@ -6,10 +6,9 @@
   "scripts": {
     "node": "npx hardhat node",
     "test": "npx hardhat test",
-    "build": "npx hardhat compile",
-    "deploy:local": "npx hardhat ignition deploy ./ignition/modules/Disk.js --network localhost",
-    "deploy:test": "npx hardhat ignition deploy ./ignition/modules/Disk.js",
-    "verify:testnet": "npx hardhat verify --network base-sepolia"
+    "compile": "npx hardhat compile",
+    "deploy:testnet:disk": "npx hardhat ignition deploy ./ignition/modules/DiskModule.js --network base-sepolia --verify",
+    "deploy:testnet:story": "npx hardhat ignition deploy ./ignition/modules/StoryModule.js --network base-sepolia --verify"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",

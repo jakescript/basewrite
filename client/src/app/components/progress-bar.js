@@ -1,25 +1,30 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { useAppContext } from "./context"
 
 const ProgressBar = () => {
   const { availableChars, initialLimits } = useAppContext()
+  const [remaining, setRemaining] = useState(availableChars / initialLimits)
+
+  useEffect(() => {
+    setRemaining(availableChars / initialLimits)
+  }, [availableChars, initialLimits])
 
   if (!availableChars) {
     return
   }
 
-  const usedCount = initialLimits - availableChars
-
+  const percentage = Math.max(0, (remaining * 100))
   return (
     <div 
-      className="w-[100vw] h-[5px] bg-gray-100"
+      className="w-[100vw] h-[5px] bg-background"
     >
       <div
-        className='h-full bg-black rounded'
+        className='h-full bg-main'
         style={{
-          width: (usedCount / initialLimits) * 100 + '%',
+          width: `${percentage}%`,
           transition: 'width 0.2s ease-in-out',
-          backgroundColor: availableChars > 0 ? 'black' : 'red'
+          // backgroundColor: remaining < 0 ? 'black' : 'red'
         }}
       >
       </div>

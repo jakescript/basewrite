@@ -1,32 +1,36 @@
 'use client'
-import { useState } from "react"
+
+import { useEffect } from "react"
 import { useAppContext } from "./context"
+import { Textarea } from "@/components/ui/textarea"
+import { calculateCharacterCost } from "../util/utils"
 
 const StoryTextArea = () => {
-  const { setAvailableChars, initialLimits } = useAppContext()
-  const [value, setValue] = useState('')
-  const [previousValue, setPreviousValue] = useState('')
+  const { 
+    setAvailableChars,
+    initialLimits,
+    writeInput,
+    setWriteInput,
+    currentStory
+  } = useAppContext()
 
   const handleChange = (e) => {
-    const currentVal = e.target.value
-
-    const characterChange = currentVal.length - previousValue.length
-
-    const newCount = initialLimits - characterChange
-
-    setPreviousValue(previousValue)
-    setValue(currentVal)
-
-    setAvailableChars(newCount)
+    setWriteInput(e.target.value)
   }
+
+  useEffect(() => {
+    const characterCost = calculateCharacterCost(currentStory, writeInput)
+    const newAvailableChars = initialLimits - characterCost
+    setAvailableChars(newAvailableChars)
+  }, [writeInput, currentStory, initialLimits, setAvailableChars])
 
 
   return (
-    <textarea 
-      value={value}
+    <Textarea 
+      value={writeInput}
       onChange={handleChange}
       rows={20}
-      className='border h-full w-full box-border outline-none'
+      className="h-full w-full"
       placeholder="A long time ago..."
       style={{ resize: 'none', padding: 10 }}
     />

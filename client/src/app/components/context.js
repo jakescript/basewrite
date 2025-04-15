@@ -17,6 +17,11 @@ export const AppContextProvider = ({ children }) => {
   const [availableChars, setAvailableChars] = useState(0)
   const [initialLimits, setInitialLimits] = useState(0)
 
+  const [loadedDisk, setLoadedDisk] = useState(null)
+
+  const [currentStory, setCurrentStory] = useState('There was once a man!')
+  const [writeInput, setWriteInput] = useState('There was once a man!')
+
   const createTokenMap = async (ids) => {
     const initialCharPromises = []
     const usedCharPromises = []
@@ -48,7 +53,20 @@ export const AppContextProvider = ({ children }) => {
       }
     })
 
+    if (Object.keys(map).length) {
+      // set the inital loaded disk to
+      // whateer the first id was for now
+      setLoadedDisk(map[ids[0]])
+    }
+
     setTokenMap(map)
+  }
+
+  const resetState = () => {
+    setTokenIds([])
+    setTokenMap({})
+    setAvailableChars(0)
+    setInitialLimits(0)
   }
 
   useEffect(() => {
@@ -83,7 +101,14 @@ export const AppContextProvider = ({ children }) => {
         tokenMap,
         availableChars,
         initialLimits,
-        setAvailableChars
+        setAvailableChars,
+        resetState,
+        currentStory,
+        setCurrentStory,
+        writeInput,
+        setWriteInput,
+        loadedDisk,
+        setLoadedDisk
       }}
     >
       {children}

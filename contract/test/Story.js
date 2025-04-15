@@ -4,107 +4,128 @@ const {
 const { expect } = require("chai");
 const { ethers } = require('hardhat');
 
-describe('Story', function () {
+describe('BaseWrite Contract', function () {
   async function deployAndSet() {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const Disk = await ethers.getContractFactory("Disk");
     const disk = await Disk.deploy(100);
 
-    const Story = await ethers.getContractFactory("Story");
-    const story = await Story.deploy(disk.target);
+    const BaseWrite = await ethers.getContractFactory("BaseWrite");
+    const baseWrite = await BaseWrite.deploy(disk.target);
 
-    return { story, disk, owner, otherAccount };
+    return { baseWrite, disk, owner, otherAccount };
   }
 
   // --- Deployment Tests ---
   describe('Deployment', function () {
     it('sets the owner on deploy', async () => {
-      const { story, owner } = await loadFixture(deployAndSet);
-      expect(await story.owner()).to.equal(owner.address);
+      const { baseWrite, owner } = await loadFixture(deployAndSet);
+      expect(await baseWrite.owner()).to.equal(owner.address);
     });
 
-    it('starts with first story active', async () => {
-      const { story } = await loadFixture(deployAndSet);
-      const currentStory = await story.storyCount();
-      const isActive = await story.isActive(Number(currentStory));
+    it('starts with first write active', async () => {
+      const { baseWrite } = await loadFixture(deployAndSet);
+      const currentStoryId = await baseWrite.storyCount();
+      const currentStory = await baseWrite.stories(currentStoryId)
 
-      expect(isActive).to.equal(true);
-      expect(Number(currentStory)).to.equal(1);
+      expect(currentStory.isActive).to.equal(true);
+      expect(Number(currentStoryId)).to.equal(1);
     });
   });
 
   // --- Access Control ---
   describe('Access Control', function () {
-    it('only owner can start a story', async () => {
-      const { story, otherAccount } = await loadFixture(deployAndSet);
+    it('only owner can start a write', async () => {
+      const { baseWrite, otherAccount } = await loadFixture(deployAndSet);
 
-      await expect(story.connect(otherAccount).startStory())
-        .to.be.revertedWithCustomError(story, 'OwnableUnauthorizedAccount')
+      await expect(baseWrite.connect(otherAccount).startStory())
+        .to.be.revertedWithCustomError(baseWrite, 'OwnableUnauthorizedAccount')
         .withArgs(otherAccount.address);
     });
+
+    it('start story emits event', async () => {
+      const { baseWrite } = await loadFixture(deployAndSet)
+      await expect(baseWrite.startStory())
+        .to.emit(baseWrite, 'StoryStarted')
+        .withArgs(2);
+    })
   });
 
   // --- Contribution Functionality ---
   describe('Contributions', function () {
-    it('allows contributing to a story', async () => {
-      const { story, disk, owner } = await loadFixture(deployAndSet);
+    it('allows contributing to a write', async () => {
+      const { baseWrite, disk, owner } = await loadFixture(deployAndSet);
 
       await disk.mint()
 
-      await story.contribute(1, 25);
-      const contributions = await story.getContributions(1);
+      await baseWrite.contribute(1, 1, 25);
+      const story = await baseWrite.stories(1)
+      const charactersUsed = await baseWrite.charactersUsed(1, owner.address)
 
-      expect(contributions.length).to.eql(1);
-
-      expect(contributions[0].author).to.equal(owner.address)
-      expect(contributions[0].tokenId).to.equal(1)
-      expect(contributions[0].count).to.equal(25)
+      expect(Number(story.totalRevisions)).to.eql(1);
+      expect(Number(charactersUsed)).to.eql(25)
     });
 
     it('emits event on contribution', async () => {
-      const { story, owner, disk } = await loadFixture(deployAndSet);
-
+      const { baseWrite, owner, disk } = await loadFixture(deployAndSet);
       await disk.mint()
-
-      await expect(story.contribute(1, 25))
-        .to.emit(story, 'ContributionCreated')
-        .withArgs(1, owner.address, 25);
+      await expect(baseWrite.contribute(1, 1, 25))
+        .to.emit(baseWrite, 'ContributionCreated')
+        .withArgs(1, 1, owner.address, 25);
     });
 
-    it('allows disk owners to contribute using owned diskId', async () => {
-      const { story, disk, owner } = await loadFixture(deployAndSet);
-      await disk.connect(owner).mint();
-      await story.contribute(1, 10);
-      const contributions = await story.getContributions(1);
+    it('tracks usage per token', async () => {
+      const { baseWrite, owner, disk } = await loadFixture(deployAndSet)
 
-      expect(contributions[0].author).to.equal(owner.address);
-    });
+      await disk.mint() // token 1
+      await disk.mint() // token 2
+
+      // story 1, token 1, length 10
+      await baseWrite.contribute(1, 1, 10)
+      await baseWrite.contribute(1, 2, 50)
+
+      const token1Count = await baseWrite.tokenIdToCharacterCount(1, 1)
+      const token2Count = await baseWrite.tokenIdToCharacterCount(1, 2)
+
+      const charactersUsed = await baseWrite.charactersUsed(1, owner.address)
+
+      expect(Number(token1Count)).to.eql(10)
+      expect(Number(token2Count)).to.eql(50)
+      expect(Number(charactersUsed)).to.eql(60)
+
+    })
   });
 
   // --- Validation & Error Handling ---
   describe('Validation and Errors', function () {
     it('reverts if caller is not the diskId owner', async () => {
-      const { story, otherAccount, disk } = await loadFixture(deployAndSet);
+      const { baseWrite, otherAccount, disk } = await loadFixture(deployAndSet);
 
       await disk.connect(otherAccount).mint();
 
-      await expect(story.contribute(1, 25))
+      await expect(baseWrite.contribute(1, 1, 25))
         .to.be.revertedWith('Not owner');
     });
 
     it('reverts if diskId does not exist', async () => {
-      const { story } = await loadFixture(deployAndSet);
-      await expect(story.contribute(1, 25)).to.be.reverted;
+      const { baseWrite } = await loadFixture(deployAndSet);
+      await expect(baseWrite.contribute(1, 1, 25)).to.be.reverted;
     });
 
     it('reverts if contribution exceeds available characters', async () => {
-      const { story, disk, owner } = await loadFixture(deployAndSet);
+      const { baseWrite, disk, owner } = await loadFixture(deployAndSet);
 
       await disk.connect(owner).mint();
 
-      await expect(story.contribute(1, 101))
+      await expect(baseWrite.contribute(1, 1, 101))
         .to.be.revertedWith('Not enough characters');
     });
+
+    it('reverts if contributing to inactive story', async () => {
+      const { baseWrite }  = await loadFixture(deployAndSet)
+      await expect(baseWrite.contribute(2,1,50))
+        .to.be.revertedWith('Story not active')
+    })
   });
 });

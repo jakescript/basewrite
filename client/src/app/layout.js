@@ -1,9 +1,9 @@
-import '@coinbase/onchainkit/styles.css';
 import { Ubuntu_Sans_Mono } from "next/font/google";
 import Idendity from "./components/identity"
 import { Providers } from "./components/providers";
-import "./globals.css";
 import Navbar from './components/nav';
+import { Toaster } from "@/components/ui/sonner";
+import "./globals.css";
 
 const ubuntu = Ubuntu_Sans_Mono({
   subsets: ['latin'],
@@ -19,11 +19,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="">
       <body
         className={`${ubuntu.variable}`}
       >
         <Providers>
+          <Toaster />
           <Navbar />
           {children}
         </Providers>

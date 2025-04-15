@@ -44,7 +44,7 @@ contract Disk is ERC721URIStorage, ERC721Enumerable, Ownable {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://basewrite-nine.vercel.app/api/metadata/";
+        return "https://basewrite-nine.vercel.app/api/metadata/disk/";
     }
 
     function tokenURI(uint256 tokenId) public view override (ERC721, ERC721URIStorage) returns (string memory) {

@@ -1,6 +1,7 @@
 'use client'
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import disk from '../util/Disk.json'
+import { Button } from "@/components/ui/button"
 
 export default function MintButton() {
   const {
@@ -34,13 +35,12 @@ export default function MintButton() {
   })
 
   return (
-    <button
+    <Button
       disabled={isPending}
       onClick={handleMint}
-      className='bg-black border text-white font-regular w-full'
-      style={{ padding: '8px 30px', marginTop: 20, borderRadius: 50 }}
+      className='mt-[20px] w-full'
     >
       { isPending ? 'Minting...' : 'Mint Now'}
-    </button>
+    </Button>
   )
 }

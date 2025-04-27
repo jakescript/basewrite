@@ -81,23 +81,5 @@ describe("Disk", function () {
 
       expect(tokenIds).to.eql([1, 2]);
     });
-
-    it('allows token owners to use characters', async () => {
-      const { disk } = await loadFixture(deployAndSet);
-
-      await (await disk.mint()).wait();
-      await (await disk.updateUsage(1, 10)).wait();
-
-      expect(Number(await disk.usedChars(1))).to.eql(10);
-    });
-
-    it('returns remaining characters for a token', async () => {
-      const { disk } = await loadFixture(deployAndSet);
-
-      await (await disk.mint()).wait();
-      await (await disk.updateUsage(1, 10)).wait();
-
-      expect(Number(await disk.getRemainingChars(1))).to.eql(90);
-    });
   });
 });

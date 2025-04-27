@@ -1,10 +1,9 @@
 "use client"
 import { useEffect, useMemo, useState } from "react"
-import { useAccount, useEnsAvatar, useEnsName, useReadContract, useDisconnect } from "wagmi"
+import { usePublicClient, useAccount, useEnsAvatar, useEnsName, useReadContract, useDisconnect } from "wagmi"
 import WalletButton from "./wallet-button"
 import Image from "next/image"
 import disk from "../util/Disk.json"
-import { useAppContext } from "./context"
 import { createAvatar } from "@dicebear/core"
 import { glass } from "@dicebear/collection"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -17,14 +16,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import { useDispatch } from "react-redux"
+import { setTokenIds } from "@/lib/tokenSlice"
+import { wagmiConfig } from "./providers"
 import { LogOut, Copy, Sun, Moon } from "lucide-react"
 
 import { toast } from "sonner"
 
 const Idendity = () => {
-  const { setTokenIds, client, resetState } = useAppContext()
+  const dispatch = useDispatch()
+
+  const client = usePublicClient({
+    config: wagmiConfig
+  })
+
   const { address } = useAccount()
+
   const { data: ensName } = useEnsName({ address })
   const { data: ensAvatar } = useEnsAvatar({ name: ensName })
   const { disconnect } = useDisconnect()
@@ -56,6 +63,7 @@ const Idendity = () => {
     }).toDataUri()
   }, [address])
 
+  // read address's balanceOf disks
   const { data: balance } = useReadContract({
     address: process.env.NEXT_PUBLIC_DISK_ADDRESS,
     abi: disk?.abi,
@@ -66,10 +74,15 @@ const Idendity = () => {
     },
   })
 
+  // get all of the address's token ids
   const getTokenIds = async (address, balance) => {
     try {
       const promises = []
 
+      /* tokenOfOwnerByIndex
+        * will return a mapping for an address
+        * that looks like mapping(uint => uint tokenId)
+      */
       for (let i = 0; i < balance; i++) {
         promises.push(
           client.readContract({
@@ -82,12 +95,14 @@ const Idendity = () => {
       }
 
       const tokenIds = (await Promise.all(promises))?.map((id) => Number(id))
-      setTokenIds(tokenIds)
+      dispatch(setTokenIds(tokenIds))
     } catch (e) {
       console.log("getTokenIds", { error: e })
     }
   }
 
+  // once unauthenticated and if they own a disk
+  // fetch all their tokenIds
   useEffect(() => {
     if (!address || !balance) {
       return
@@ -107,27 +122,15 @@ const Idendity = () => {
     }
   }
 
-  const disconnectAndReset = () => {
-    disconnect()
-    resetState()
-  }
-
   const toggleMode = () => {
     const newTheme = theme === "dark" ? "" : "dark"
-
-    // Update DOM
     document.body.classList.toggle("dark", newTheme === "dark")
-
-    // Update state
     setTheme(newTheme)
-
-    // Save to localStorage
     localStorage.setItem("theme", newTheme)
-
-    // Show toast notification
     toast(`${newTheme === "dark" ? "Dark" : "Light"} mode activated`)
   }
 
+  // unauthenticated button
   if (!address) {
     return <WalletButton />
   }
@@ -157,7 +160,7 @@ const Idendity = () => {
               <Copy className="mr-2 h-4 w-4" />
               <span>Copy Address</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={disconnectAndReset}>
+            <DropdownMenuItem onSelect={disconnect}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Disconnect</span>
             </DropdownMenuItem>

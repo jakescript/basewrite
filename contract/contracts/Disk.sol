@@ -26,21 +26,11 @@ contract Disk is ERC721URIStorage, ERC721Enumerable, Ownable {
     }
 
     function updateDefaultLimit(uint newLimit) public onlyOwner {
-      require(newLimit > 0, 'Default limit can not be zero');
       defaultCharLimit = newLimit;
     }
 
-    function updateUsage(uint tokenId, uint amount) public returns (uint) {
-      require(msg.sender == ownerOf(tokenId), 'Not the token owner');
-      require(usedChars[tokenId] + amount <= charLimits[tokenId], 'No characters left');
-
-      usedChars[tokenId] += amount;
-
-      return usedChars[tokenId];
-    }
-
-    function getRemainingChars(uint tokenId) public view returns (uint) {
-      return charLimits[tokenId] - usedChars[tokenId];
+    function setCharLimit(uint tokenId, uint limit) public onlyOwner {
+      charLimits[tokenId] = limit;
     }
 
     function _baseURI() internal pure override returns (string memory) {
@@ -62,5 +52,4 @@ contract Disk is ERC721URIStorage, ERC721Enumerable, Ownable {
     function _increaseBalance(address account, uint128 amount) internal override(ERC721, ERC721Enumerable) {
       super._increaseBalance(account, amount);
     }
-
 }

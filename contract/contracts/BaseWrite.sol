@@ -7,8 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 interface IDisk is IERC721 {
-  function getRemainingChars(uint tokenId) external view returns (uint);
-  function tokenCount() external view returns (uint);
+  function charLimits(uint tokenId) external view returns (uint);
 }
 
 contract BaseWrite is ERC721URIStorage, Ownable {
@@ -17,7 +16,7 @@ contract BaseWrite is ERC721URIStorage, Ownable {
 
   struct Story {
     bool isActive;
-    uint totalRevisions;
+    uint totalContributions;
     mapping(address => uint) charactersUsed;
     mapping(uint => uint) tokenIdToCharacterCount;
   }
@@ -47,14 +46,14 @@ contract BaseWrite is ERC721URIStorage, Ownable {
   function contribute(uint storyId, uint diskId, uint length) public {
     require(stories[storyId].isActive, 'Story not active');
     require(msg.sender == disk.ownerOf(diskId), 'Not owner');
-    require(length <= disk.getRemainingChars(diskId), 'Not enough characters');
 
     Story storage story = stories[storyId];
 
     story.charactersUsed[msg.sender] += length;
     story.tokenIdToCharacterCount[diskId] += length;
-    story.totalRevisions++;
+    story.totalContributions++;
 
+    require(story.tokenIdToCharacterCount[diskId] <= disk.charLimits(diskId), 'Not enough characters');
     emit ContributionCreated(storyId, diskId, msg.sender, length);
   }
 

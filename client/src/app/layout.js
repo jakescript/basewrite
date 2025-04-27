@@ -1,5 +1,4 @@
 import { Ubuntu_Sans_Mono } from "next/font/google";
-import Idendity from "./components/identity"
 import { Providers } from "./components/providers";
 import Navbar from './components/nav';
 import { Toaster } from "@/components/ui/sonner";
@@ -19,7 +18,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="">
+    <html lang="en" className="bg-secondary-background">
       <body
         className={`${ubuntu.variable}`}
       >

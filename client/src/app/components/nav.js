@@ -21,7 +21,7 @@ const Navbar = () => {
 
   return (
     <div
-      className='bg-background text-black justify-center items-center flex py-[10px] px-[1rem] h-[75px]'
+      className='bg-secondary-background text-black justify-center items-center flex py-[10px] px-[1rem] h-[75px]'
       style={{ borderBottom: '2px solid black',}}
     >
       <div className='flex gap-[10px] justify-between w-full items-center'>

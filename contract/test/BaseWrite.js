@@ -63,7 +63,7 @@ describe('BaseWrite Contract', function () {
       const story = await baseWrite.stories(1)
       const charactersUsed = await baseWrite.charactersUsed(1, owner.address)
 
-      expect(Number(story.totalRevisions)).to.eql(1);
+      expect(Number(story.totalContributions)).to.eql(1);
       expect(Number(charactersUsed)).to.eql(25)
     });
 
@@ -93,7 +93,6 @@ describe('BaseWrite Contract', function () {
       expect(Number(token1Count)).to.eql(10)
       expect(Number(token2Count)).to.eql(50)
       expect(Number(charactersUsed)).to.eql(60)
-
     })
   });
 

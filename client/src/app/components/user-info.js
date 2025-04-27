@@ -1,20 +1,16 @@
 'use client'
-import { useAppContext } from "./context"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from '@/components/ui/label'
+import { useSelector } from "react-redux"
 
 const UserInfo = () => {
-  const { availableChars, tokenMap, loadedDisk, setLoadedDisk } = useAppContext()
-
-  const tokens = Object.values(tokenMap)
+  const availableChars = useSelector(s => s.token.availableChars)
 
   return (
     <Card className='w-full'>
@@ -23,26 +19,8 @@ const UserInfo = () => {
         <CardDescription>Other stuff</CardDescription>
       </CardHeader>
 
-      <CardContent className='flex flex-col gap-5'>
+      <CardContent>
         <Label>Remaining Characters: {availableChars}</Label>
-        {tokens.length ? (
-          <div className="flex flex-col gap-2">
-            { tokens.map(token => (
-              <Label key={token.id}>
-                Disk #{token.id}: {token.initialLimit} {token.usedChars}&nbsp;
-                { loadedDisk?.id === token.id ? '[Loaded]' : (
-                  <Button
-                    variant='noShadow'
-                    size='sm'
-                    onClick={() => setLoadedDisk(token)}
-                  >
-                    Load
-                  </Button>
-                )}
-              </Label>
-            ))}
-          </div>
-        ) : null }
       </CardContent>
     </Card>
   )

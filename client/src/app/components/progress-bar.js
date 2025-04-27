@@ -1,14 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useAppContext } from "./context"
+import { useSelector } from 'react-redux'
 
 const ProgressBar = () => {
-  const { availableChars, initialLimits } = useAppContext()
-  const [remaining, setRemaining] = useState(availableChars / initialLimits)
+  const availableChars = useSelector(s => s.token.availableChars)
+  const initialLimit = useSelector(s => s.token.initialLimit)
+  const [remaining, setRemaining] = useState(availableChars / initialLimit)
 
   useEffect(() => {
-    setRemaining(availableChars / initialLimits)
-  }, [availableChars, initialLimits])
+    setRemaining(availableChars / initialLimit)
+  }, [availableChars, initialLimit])
 
   if (!availableChars) {
     return

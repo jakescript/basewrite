@@ -4,7 +4,7 @@ import { metaMask } from 'wagmi/connectors'
 import { Button } from '@/components/ui/button'
 
 const WalletButton = () => {
-  const { connectors, connect } = useConnect()
+  const { connect } = useConnect()
 
   return (
     <>

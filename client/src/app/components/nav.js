@@ -27,7 +27,7 @@ const Navbar = () => {
       <div className='flex gap-[10px] justify-between w-full items-center'>
         <div className='flex gap-[10px]'>
           <div className="flex items-center gap-[5px]">
-            <p className='font-bold'><Link href='/'>BaseWrite</Link></p>
+            <p className='font-bold text-foreground'><Link href='/'>BaseWrite</Link></p>
           </div>
           <ul className='flex gap-[25px] ml-[20px]'>
             { items.map((item, i) => (

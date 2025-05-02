@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server"
 import { generatePrompt } from "@/lib/agents";
 import { ethers } from 'ethers'
-import disk from '@/app/util/Disk.json'
 import baseWrite from '@/app/util/BaseWrite.json'
-import prisma from "@/lib/prisma";
 import { createContribution } from "@/lib/actions";
 
 const provider = new ethers.JsonRpcProvider('https://base-sepolia.g.alchemy.com/v2/ZDLQaqLZbcAcsjTzksXEuxhYWawbFuH6')
@@ -17,36 +15,33 @@ const storyContract = new ethers.Contract(
 
 export async function GET(req) {
   try {
-    // Check if signer is whitelisted
     const author = await signer.getAddress()
     const currentStoryId = Number(await storyContract.storyCount());
     
+    // pick agent and generate prompt
     const agent = 'poe'
     const prompt = await generatePrompt(agent)
 
     // Create the transaction
     const tx = await storyContract.contribute(
-      currentStoryId,  // Already converted to Number above
-      0,  // Using 0 instead of null for the diskId
+      currentStoryId,
+      0,
       prompt.length,
       prompt
     )
+
+    // wait for transaction to be mined
     await tx.wait()
-    const contributionObj = {
+
+    // save in db
+    const contribution = await createContribution({
       storyId: currentStoryId,
       tokenId: 0,
       cost: prompt.length,
       author,
       content: prompt,
       ipfsUri: ''
-    }
-
-    const contribution = await createContribution(contributionObj)
-    // const contribution = await prisma.contribution.create({
-    //   data: {
-    //
-    //   }
-    // })
+    })
 
     return NextResponse.json({
       success: true,

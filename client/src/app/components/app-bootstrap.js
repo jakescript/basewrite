@@ -65,8 +65,6 @@ export const AppBootstrap = ({ children }) => {
 
     const availableChars = totalLimits - Number(charactersUsed)
 
-    console.log({ availableChars, totalLimits, map, charactersUsed })
-
     dispatch(setTokenMap(map))
     dispatch(setInitialLimit(totalLimits))
     dispatch(setAvailableChars(availableChars))

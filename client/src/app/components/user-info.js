@@ -25,20 +25,17 @@ const UserInfo = () => {
 
   return (
     <Card className='w-full'>
-      {/* <CardHeader> */}
-      {/*   <CardTitle>User Info</CardTitle> */}
-      {/*   <CardDescription>Other stuff</CardDescription> */}
-      {/* </CardHeader> */}
-
       <CardContent>
         <Label>Remaining Characters: {availableChars}</Label>
 
-        <div>
-          <Label>Contributors:</Label>
-          { Object.keys(authorTotals).map((address) => (
-            <p>0x{address.slice(address.length - 5)}: {authorTotals[address]}</p>
-          ))}
-        </div>
+        { contributions?.length ? (
+          <div>
+            <Label>Contributors:</Label>
+            { Object.keys(authorTotals).map((address) => (
+              <p key={address}>0x{address.slice(address.length - 5)}: {authorTotals[address]}</p>
+            ))}
+          </div>
+        ) : null }
       </CardContent>
     </Card>
   )

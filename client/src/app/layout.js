@@ -18,7 +18,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="bg-secondary-background">
+    <html lang="en" className="bg-background">
       <body
         className={`${ubuntu.variable}`}
       >

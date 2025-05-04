@@ -17,6 +17,7 @@ contract BaseWrite is ERC721URIStorage, Ownable {
   struct Story {
     bool isActive;
     uint256 startTime;
+    string poet;
     mapping(address => uint) charactersUsed;
     mapping(uint => uint) tokenIdToCharacterCount;
   }
@@ -51,7 +52,7 @@ contract BaseWrite is ERC721URIStorage, Ownable {
     emit AgentRemoved(agent);
   }
 
-  function startDailyStory() external onlyOwner {
+  function startDailyStory(string calldata poet) external onlyOwner {
     if (storyCount > 0) {
       require(!stories[storyCount].isActive, "Current story still active");
     }
@@ -60,6 +61,7 @@ contract BaseWrite is ERC721URIStorage, Ownable {
     Story storage story = stories[storyCount];
     story.isActive = true;
     story.startTime = block.timestamp;
+    story.poet = poet;
     
     emit StoryStarted(storyCount);
   }

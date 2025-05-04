@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { generatePrompt } from "@/lib/agents";
+import { generatePrompt, pickAgent } from "@/lib/agents/utils";
 import { ethers } from 'ethers'
 import baseWrite from '@/app/util/BaseWrite.json'
 import { createContribution } from "@/lib/actions";
@@ -15,11 +15,11 @@ const storyContract = new ethers.Contract(
 
 export async function GET(req) {
   try {
+    const agent = pickAgent()
     const author = await signer.getAddress()
     const currentStoryId = Number(await storyContract.storyCount());
-    
+
     // pick agent and generate prompt
-    const agent = 'poe'
     const prompt = await generatePrompt(agent)
 
     // Create the transaction
@@ -44,7 +44,6 @@ export async function GET(req) {
     })
 
     return NextResponse.json({
-      success: true,
       transactionHash: tx.hash,
       contribution
     });
